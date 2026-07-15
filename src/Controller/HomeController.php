@@ -16,15 +16,26 @@ class HomeController extends AbstractController
     {
 
         $userId = $session->get('user_id');
-        $user = $userRepository->find($userId);
-
+        
         if (!$userId) {
             return $this->redirectToRoute('app_login');
         }
 
+        $user = $userRepository->find($userId);
+
         return $this->render('home/home.html.twig', [
             'user' => $user
         ]);
+    }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(SessionInterface $session): Response
+    {
+        // Supprimer l'id utilisateur de la session
+        $session->remove('user_id');    
+
+        // Rediriger vers la page de connexion
+        return $this->redirectToRoute('app_login');
     }
 
     #[Route('/presentation')]
