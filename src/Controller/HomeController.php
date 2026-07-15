@@ -5,13 +5,26 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class HomeController extends AbstractController
 {
-    #[Route('/')]
-    public function home(): Response
+    #[Route('/home', name: 'app_home')]
+    public function home(SessionInterface $session, UserRepository $userRepository): Response
     {
-        return $this->render('home/home.html.twig');
+
+        $userId = $session->get('user_id');
+        $user = $userRepository->find($userId);
+
+        if (!$userId) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('home/home.html.twig', [
+            'user' => $user
+        ]);
     }
 
     #[Route('/presentation')]
@@ -23,7 +36,7 @@ class HomeController extends AbstractController
             'age'    => 21
         ];
 
-        return $this->render('home/presentation.html.twig', [
+        return $this->render('home/presentation.html.twig', [ 
             'identite' => $identite
         ]);
     }
